@@ -4,6 +4,9 @@ function Form() {
   const [file, setFile] = useState();
   const [profilePicture, setProfilePicture] = useState(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState(null);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
   function handleFile(event) {
     setFile(event.target.files[0]);
@@ -18,13 +21,43 @@ function Form() {
     reader.readAsDataURL(event.target.files[0]);
   }
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+console.log("hello")
+    // Create a FormData object to handle file uploads
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('phone', phone);
+    formData.append('file', file);
+    if (profilePicture) {
+      formData.append('profilePicture', profilePicture);
+    }
+
+    try {
+      const response = await fetch('https://your-api-endpoint.com/submit', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      console.log('Data submitted successfully:', result);
+    } catch (error) {
+      console.error('Error submitting data:', error);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-md p-8 space-y-6 bg-white shadow-lg rounded-lg mx-auto">
         <h2 className="text-5xl font-semibold text-center">Profile Picture</h2>
         <div className="flex justify-center">
           <label htmlFor="profile-picture" className="cursor-pointer">
-            {profilePicturePreview? (
+            {profilePicturePreview ? (
               <img
                 src={profilePicturePreview}
                 alt="Profile Picture"
@@ -58,12 +91,14 @@ function Form() {
         </div>
         <p className="text-center">Enter your details</p>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="input-box mb-4">
             <input
               type="text"
               placeholder="Name"
               required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="border border-black rounded-md p-2 w-full"
             />
           </div>
@@ -73,6 +108,8 @@ function Form() {
               type="text"
               placeholder="Email"
               required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="border border-black rounded-md p-2 w-full"
             />
           </div>
@@ -82,6 +119,8 @@ function Form() {
               type="text"
               placeholder="Phone Number"
               required
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="border border-black rounded-md p-2 w-full"
             />
           </div>
@@ -95,7 +134,7 @@ function Form() {
             type="submit"
             className="bg-black text-white px-20 py-2 rounded-md w-full"
           >
-            Log In
+            Submit
           </button>
         </form>
       </div>
