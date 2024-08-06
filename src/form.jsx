@@ -1,55 +1,44 @@
 import React, { useState } from "react";
 
 function Form() {
-  const [file, setFile] = useState();
-  const [profilePicture, setProfilePicture] = useState(null);
-  const [profilePicturePreview, setProfilePicturePreview] = useState(null);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [formData, setFormData] = useState({})
 
-  function handleFile(event) {
-    setFile(event.target.files[0]);
-  }
+  const [file, setFile] = useState(null);
 
-  function handleProfilePictureChange(event) {
-    setProfilePicture(event.target.files[0]);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setProfilePicturePreview(reader.result);
-    };
-    reader.readAsDataURL(event.target.files[0]);
-  }
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-console.log("hello")
-    // Create a FormData object to handle file uploads
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('email', email);
-    formData.append('phone', phone);
-    formData.append('file', file);
-    if (profilePicture) {
-      formData.append('profilePicture', profilePicture);
-    }
-
-    try {
-      const response = await fetch('https://your-api-endpoint.com/submit', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const result = await response.json();
-      console.log('Data submitted successfully:', result);
-    } catch (error) {
-      console.error('Error submitting data:', error);
+  const handleChange = (e) => {
+    const { name, value, type, files } = e.target;
+    if (type === "file") {
+      setFile(files[0]);
+    } else {
+      setFormData({ ...formData, [name]: value });
     }
   };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const data = new FormData();
+    // Append text fields
+    for (const key in formData) {
+      if (formData.hasOwnProperty(key)) {
+        data.append(key, formData[key]);
+      }
+    }
+    // Append file
+    if (file) {
+      data.append("file", file);
+    }
+
+    const url = "http://localhost:5000/upload";
+    fetch(url, {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data))
+      .catch((err) => console.error(err));
+  };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -57,9 +46,9 @@ console.log("hello")
         <h2 className="text-5xl font-semibold text-center">Profile Picture</h2>
         <div className="flex justify-center">
           <label htmlFor="profile-picture" className="cursor-pointer">
-            {profilePicturePreview ? (
+            {/* {profilePicturePreview ? (
               <img
-                src={profilePicturePreview}
+                // src={profilePicturePreview}
                 alt="Profile Picture"
                 className="w-10 h-10 rounded-full object-cover"
               />
@@ -80,12 +69,13 @@ console.log("hello")
                   />
                 </svg>
               </div>
-            )}
+            )} */}
           </label>
           <input
             type="file"
             id="profile-picture"
-            onChange={handleProfilePictureChange}
+            name="profile_picture"
+            // onChange={handleProfilePictureChange}
             className="hidden"
           />
         </div>
@@ -96,9 +86,19 @@ console.log("hello")
             <input
               type="text"
               placeholder="Name"
+              name="name"
               required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={handleChange}
+              className="border border-black rounded-md p-2 w-full"
+            />
+          </div>
+          <div className="input-box mb-4">
+            <input
+              type="file"
+              placeholder="Name"
+              name="file"
+              required
+              onChange={handleChange}
               className="border border-black rounded-md p-2 w-full"
             />
           </div>
@@ -107,9 +107,9 @@ console.log("hello")
             <input
               type="text"
               placeholder="Email"
+              name="email"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleChange}
               className="border border-black rounded-md p-2 w-full"
             />
           </div>
@@ -118,17 +118,17 @@ console.log("hello")
             <input
               type="text"
               placeholder="Phone Number"
+              name="phoneNumber"
               required
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={handleChange}
               className="border border-black rounded-md p-2 w-full"
             />
           </div>
 
-          <p>Attach your documents below</p>
+          {/* <p>Attach your documents below</p>
           <input type="file" name="file" onChange={handleFile} className="mb-4" />
           <br />
-          <br />
+          <br /> */}
 
           <button
             type="submit"
