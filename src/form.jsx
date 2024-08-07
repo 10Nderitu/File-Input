@@ -18,7 +18,8 @@ function Form() {
     event.preventDefault();
 
     const data = new FormData();
-    // Append text fields
+    
+    // Append text field
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
         data.append(key, formData[key]);
@@ -45,32 +46,16 @@ function Form() {
       <div className="w-full max-w-md p-8 space-y-6 bg-white shadow-lg rounded-lg mx-auto">
         <h2 className="text-5xl font-semibold text-center">Profile Picture</h2>
         <div className="flex justify-center">
-          <label htmlFor="profile-picture" className="cursor-pointer">
-            {/* {profilePicturePreview ? (
-              <img
-                // src={profilePicturePreview}
-                alt="Profile Picture"
-                className="w-10 h-10 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-200 flex justify-center items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-gray-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </div>
-            )} */}
-          </label>
+        <div>
+          
+        <img 
+          src="src/assets/org.jpg"
+          style={{width: '60px', height: '60px'}} />
+        </div>
+          
+          <br/>
+          <br/>
+
           <input
             type="file"
             id="profile-picture"
@@ -87,16 +72,6 @@ function Form() {
               type="text"
               placeholder="Name"
               name="name"
-              required
-              onChange={handleChange}
-              className="border border-black rounded-md p-2 w-full"
-            />
-          </div>
-          <div className="input-box mb-4">
-            <input
-              type="file"
-              placeholder="Name"
-              name="file"
               required
               onChange={handleChange}
               className="border border-black rounded-md p-2 w-full"
@@ -125,10 +100,19 @@ function Form() {
             />
           </div>
 
-          {/* <p>Attach your documents below</p>
-          <input type="file" name="file" onChange={handleFile} className="mb-4" />
-          <br />
-          <br /> */}
+          <p>Attach your documents below</p>
+
+          <div className="input-box mb-4">
+            <input
+              type="file"
+              placeholder="Name"
+              name="file"
+              required
+              onChange={handleChange}
+              className="border border-black rounded-md p-2 w-full"
+            />
+          </div>
+          <br/>
 
           <button
             type="submit"
