@@ -1,26 +1,50 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 
 function Form() {
-  const [formData, setFormData] = useState({})
-  const [file, setFile] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [files, setFiles] = useState({
+    profile_picture: null,
+    file1: null,
+    file2: null
+  });
   const [previewUrl, setPreviewUrl] = useState("src/assets/org.jpg");
+  
+  // Create refs for file inputs
+  const fileInputRefs = {
+    profile_picture: useRef(null),
+    file1: useRef(null),
+    file2: useRef(null)
+  };
 
   const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
+    const { name, value, type, files: uploadedFiles } = e.target;
     if (type === "file") {
-      if (name === "profile_picture") {
-        const selectedFile = files[0];
-        setFile(selectedFile);
-        const fileReader = new FileReader();
-        fileReader.onload = () => {
-          setPreviewUrl(fileReader.result);
-        };
-        fileReader.readAsDataURL(selectedFile);
-      } else {
-        setFile(files[0]);
+      if (uploadedFiles.length > 0) {
+        if (name === "profile_picture") {
+          const selectedFile = uploadedFiles[0];
+          setFiles(prev => ({ ...prev, [name]: selectedFile }));
+          const fileReader = new FileReader();
+          fileReader.onload = () => {
+            setPreviewUrl(fileReader.result);
+          };
+          fileReader.readAsDataURL(selectedFile);
+        } else {
+          setFiles(prev => ({ ...prev, [name]: uploadedFiles[0] }));
+        }
       }
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleCancel = (name) => {
+    setFiles(prev => ({ ...prev, [name]: null }));
+    if (name === "profile_picture") {
+      setPreviewUrl("src/assets/org.jpg");
+    }
+    // Reset the file input
+    if (fileInputRefs[name].current) {
+      fileInputRefs[name].current.value = "";
     }
   };
 
@@ -29,16 +53,17 @@ function Form() {
 
     const data = new FormData();
     
-    // Append text field
-    for (const key in formData) {
-      if (formData.hasOwnProperty(key)) {
-        data.append(key, formData[key]);
+    // Append text fields
+    Object.entries(formData).forEach(([key, value]) => {
+      data.append(key, value);
+    });
+
+    // Append files
+    Object.entries(files).forEach(([key, file]) => {
+      if (file) {
+        data.append(key, file);
       }
-    }
-    // Append file
-    if (file) {
-      data.append("file", file);
-    }
+    });
 
     const url = "http://localhost:5000/upload";
     fetch(url, {
@@ -63,14 +88,27 @@ function Form() {
             />
           
             <br/>
-            <input
-              type="file"
-              id="profile-picture"
-              name="profile_picture"
-              onChange={handleChange}
-              className="hidden"
-              accept="image/*"
-            />
+            <div className="flex items-center">
+              <input
+                type="file"
+                id="profile-picture"
+                name="profile_picture"
+                onChange={handleChange}
+                ref={fileInputRefs.profile_picture}
+                className="hidden"
+                accept="image/*"
+              />
+              
+              {files.profile_picture && (
+                <button
+                  type="button"
+                  onClick={() => handleCancel("profile_picture")}
+                  className="bg-red-500 text-white px-2 py-1 rounded-md text-sm"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </div>
         </div>
         
@@ -112,25 +150,44 @@ function Form() {
 
           <p>Attach your documents below</p>
 
-          <div className="input-box">
+          <div className="input-box flex items-center">
             <input
               type="file"
               placeholder="Name"
-              name="file"
-              required
+              name="file1"
               onChange={handleChange}
+              ref={fileInputRefs.file1}
               className="border border-black rounded-md p-2 w-full"
             />
+            {files.file1 && (
+              <button
+                type="button"
+                onClick={() => handleCancel("file1")}
+                className="bg-red-500 text-white px-2 py-1 rounded-md text-sm ml-2"
+              >
+                ✕
+              </button>
+            )}
           </div>
-          <div className="input-box">
+
+          <div className="input-box flex items-center">
             <input
               type="file"
               placeholder="Name"
-              name="file"
-              required
+              name="file2"
               onChange={handleChange}
+              ref={fileInputRefs.file2}
               className="border border-black rounded-md p-2 w-full"
             />
+            {files.file2 && (
+              <button
+                type="button"
+                onClick={() => handleCancel("file2")}
+                className="bg-red-500 text-white px-2 py-1 rounded-md text-sm ml-2"
+              >
+                ✕
+              </button>
+            )}
           </div>
           <br/>
 
