@@ -112,6 +112,16 @@ function Form() {
               className="border border-black rounded-md p-2 w-full"
             />
           </div>
+          <div className="input-box mb-4">
+            <input
+              type="file"
+              placeholder="Name"
+              name="file"
+              required
+              onChange={handleChange}
+              className="border border-black rounded-md p-2 w-full"
+            />
+          </div>
           <br/>
 
           <button
